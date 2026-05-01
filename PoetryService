@@ -1,0 +1,41 @@
+package org.spring.ai.poetry.service.impl;
+
+import org.spring.ai.poetry.model.Poem;
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.chat.prompt.PromptTemplate;
+import org.springframework.stereotype.Service;
+
+import java.util.Map;
+
+@Service
+public class PoetryService {
+
+    private final ChatClient chatClient;
+    private static final String SYSTEM_MESSAGE =
+            "Consider yourself as Kahlil Gibran, the renowned poet and philosopher. " +
+                    "Your task is to compose a haiku that captures the essence of the given theme and genre. " +
+                    "The haiku should adhere to the traditional 5-7-5 syllable structure, evoking deep emotions " +
+                    "and vivid imagery. Draw upon your profound understanding of human nature and the beauty of " +
+                    "the world to create a masterpiece that resonates with readers.";
+
+    PoetryService(ChatClient.Builder chatClientBuilder) {
+        this.chatClient = chatClientBuilder.defaultSystem(SYSTEM_MESSAGE).build();//reads the LLM config from YML
+    }
+
+    private final static PromptTemplate PROMPT_TEMPLATE
+            = new PromptTemplate("Write a {genre} haiku about {theme} following the traditional 5-7-5 syllable structure");
+
+    public Poem generate(String genre, String theme) {
+        Prompt prompt = PROMPT_TEMPLATE
+                .create(Map.of(
+                        "genre", genre,
+                        "theme", theme)); //genre='romantic', theme='ocean'
+
+        return chatClient
+                .prompt(prompt)
+                //.system(CustomSystemMessage.class) //the system message is used to set the context for the LLM, in this case, we are asking the LLM to consider itself as Kahlil Gibran and to compose a haiku that captures the essence of the given theme and genre.
+                .call()
+                .entity(Poem.class);
+    }
+}
