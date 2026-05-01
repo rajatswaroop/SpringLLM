@@ -1,0 +1,18 @@
+package org.spring.ai.poetry.exception;
+
+import org.slf4j.ILoggerFactory;
+import org.springframework.ai.openai.api.common.OpenAiApiClientErrorException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+
+public class AIException {
+
+    private static final String LLM_COMMUNICATION_ERROR =
+            "Unable to communicate with the configured LLM. Please try again later.";
+
+    @ExceptionHandler(OpenAiApiClientErrorException.class)
+    ProblemDetail handle(OpenAiApiClientErrorException exception){
+        return ProblemDetail.forStatusAndDetail(HttpStatus.SERVICE_UNAVAILABLE, LLM_COMMUNICATION_ERROR);
+    }
+}
