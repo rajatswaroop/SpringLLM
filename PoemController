@@ -1,0 +1,25 @@
+package org.spring.ai.poetry.controller;
+
+import org.spring.ai.poetry.model.Poem;
+import org.spring.ai.poetry.service.impl.PoetryService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class PoemController {
+
+    @Autowired
+    PoetryService poetryService;
+
+    @PostMapping("/poems")
+    ResponseEntity<Poem> generate(@RequestBody PoemGenerationRequest request) {
+        Poem response= poetryService.generate(request.genre(), request.theme());
+        return ResponseEntity.ok(response);
+    }
+
+    record PoemGenerationRequest(String genre, String theme) {
+    }
+}
